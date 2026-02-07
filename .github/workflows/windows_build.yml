@@ -1,24 +1,22 @@
-name: Windows Build 
-on: 
-  push: 
-    branches: [ "main" ] 
-jobs: 
-  build-windows: 
-    runs-on: windows-latest 
-    steps: 
-    - uses: actions/checkout@v4 
-    - name: Setup Node.js 
-      uses: actions/setup-node@v4 
-      with: 
-        node-version: 'lts/*' 
-    - name: Install Rust 
-      uses: dtolnay/rust-toolchain@stable 
-    - name: Install dependencies 
-      run: npm install 
-    - name: Build App 
-      run: npm run tauri build 
-    - name: Upload Installer 
-      uses: actions/upload-artifact@v4 
-      with: 
-        name: PC-Windows-Installer 
-        path: src-tauri/target/release/bundle/*/*.{exe,msi} 
+name: Windows Build
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Nuget
+      uses: nuget/setup-nuget@v1
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+    - name: Restore NuGet packages
+      run: nuget restore LittleBigMouse.sln
+    - name: Build Solution
+      run: msbuild LittleBigMouse.sln /p:Configuration=Release /p:Platform="Any CPU"
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: LittleBigMouse-Build
+        path: "**/bin/Release/**"
