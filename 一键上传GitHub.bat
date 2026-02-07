@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 chcp 65001 >nul
-title GitHub 万能发布工具 (C# 修复版)
+title GitHub 万能发布工具 (C# .NET 8 修复版)
 color 0A
 
 :: ========================================================
@@ -54,7 +54,7 @@ if "%repo_url%"=="" goto manual_repo
 goto mode_menu
 
 :: ========================================================
-:: 2. 项目类型 (已修复 C# 编译配置)
+:: 2. 项目类型 (已升级为 .NET 8 模式)
 :: ========================================================
 :mode_menu
 cls
@@ -62,8 +62,8 @@ echo ========================================================
 echo               第二步：选择项目类型
 echo ========================================================
 echo.
-echo  [1] 电脑软件 (C# / .NET Windows)
-echo      - 目标: .exe (自动修复 npm 报错问题)
+echo  [1] 电脑软件 (C# .NET 8 / WinUI 3)
+echo      - 目标: .exe (修复依赖丢失报错)
 echo.
 echo  [2] 安卓软件 (Android)
 echo      - 目标: .apk
@@ -75,10 +75,10 @@ if "%mode%"=="1" goto pc_config
 if "%mode%"=="2" goto android_config
 goto mode_menu
 
-:: --- 电脑版配置 (PC) - 已修复为 C# 专用 ---
+:: --- 电脑版配置 (PC) - .NET 8 专用 ---
 :pc_config
 echo.
-echo [1/3] 正在生成 Windows 配置 (C# .NET 模式)...
+echo [1/3] 正在生成 Windows 配置 (.NET 8 模式)...
 if not exist ".github\workflows" mkdir ".github\workflows"
 del ".github\workflows\*.yml" 2>nul
 
@@ -92,19 +92,19 @@ echo   build:
 echo     runs-on: windows-latest
 echo     steps:
 echo     - uses: actions/checkout@v4
-echo     - name: Setup Nuget
-echo       uses: nuget/setup-nuget@v1
-echo     - name: Setup MSBuild
-echo       uses: microsoft/setup-msbuild@v1
-echo     - name: Restore NuGet packages
-echo       run: nuget restore LittleBigMouse.sln
-echo     - name: Build Solution
-echo       run: msbuild LittleBigMouse.sln /p:Configuration=Release /p:Platform="Any CPU"
+echo     - name: Setup .NET 8
+echo       uses: actions/setup-dotnet@v4
+echo       with:
+echo         dotnet-version: 8.0.x
+echo     - name: Restore dependencies
+echo       run: dotnet restore LittleBigMouse.sln
+echo     - name: Build
+echo       run: dotnet build LittleBigMouse.sln -c Release
 echo     - name: Upload Artifact
 echo       uses: actions/upload-artifact@v4
 echo       with:
 echo         name: LittleBigMouse-Build
-echo         path: "**/bin/Release/**"
+echo         path: "**/bin/Release/**/*.exe"
 ) > ".github\workflows\windows_build.yml"
 
 goto upload_start
