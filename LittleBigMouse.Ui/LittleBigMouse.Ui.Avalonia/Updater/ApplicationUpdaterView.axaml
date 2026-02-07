@@ -1,0 +1,42 @@
+﻿<Window x:Class="LittleBigMouse.Ui.Avalonia.Updater.ApplicationUpdaterView"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:updater="clr-namespace:LittleBigMouse.Ui.Avalonia.Updater"
+        mc:Ignorable="d" 
+        Width="400"
+        Height="260"
+        WindowStartupLocation="CenterScreen"
+		SizeToContent="Height"
+        Title="更新 Little Big Mouse"
+		Icon="{Binding MainIcon}"
+        d:DesignHeight="300" d:DesignWidth="300"
+        x:DataType="updater:ApplicationUpdaterViewModel"
+        >
+    <DockPanel Margin="10">
+        <TextBlock 
+            
+            DockPanel.Dock="Top" 
+            FontWeight="Bold" 
+            Text="{Binding Message,FallbackValue=发现新版本}"
+            TextWrapping="WrapWithOverflow"
+            />
+        
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Label>当前版本：</Label>
+            <Label Content="{Binding CurrentVersion}"/>
+        </StackPanel>
+        
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Label>最新版本：</Label>
+            <Label Content="{Binding NewVersion}"/>
+        </StackPanel>
+            
+        <ProgressBar DockPanel.Dock="Top" Height="20" Value="{Binding Progress}" Maximum="100" Margin="20"/>
+        <StackPanel Height="40" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button FontWeight="Bold" IsDefault="True" Padding="5" Command="{Binding UpdateCommand}"> 更新 </Button>
+            <Button Padding="5" Click="ButtonBase_OnClick"> 取消 </Button>
+        </StackPanel>
+    </DockPanel>
+</Window>

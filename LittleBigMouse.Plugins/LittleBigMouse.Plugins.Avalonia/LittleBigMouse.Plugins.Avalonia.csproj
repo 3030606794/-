@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>net8.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <Platforms>x64;x86;AnyCpu</Platforms>
+	<Version>5.2.3.0</Version>
+	<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.1.0-beta2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HLab.Core\HLab.Mvvm.Annotations\HLab.Mvvm.Annotations.csproj" />
+    <ProjectReference Include="..\..\LittleBigMouse.Core\LittleBigMouse.DisplayLayout\LittleBigMouse.DisplayLayout.csproj" />
+    <ProjectReference Include="..\LittleBigMouse.Plugins.Core\LittleBigMouse.Plugins.csproj" />
+  </ItemGroup>
+
+</Project>

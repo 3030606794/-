@@ -1,0 +1,300 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:options="clr-namespace:LittleBigMouse.Ui.Avalonia.Options"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LittleBigMouse.Ui.Avalonia.Options.LayoutOptions"
+             x:DataType="options:LbmOptionsViewModel"
+			 Background="Transparent"
+			 >
+	<UserControl.Styles>
+
+		<Style Selector="ListBox.RadioButtonListBox">
+			<Setter Property="BorderBrush" Value="Transparent"/>
+		</Style>
+
+		<Style Selector="ListBox.RadioButtonListBox ListBoxItem">
+			<Setter Property="Padding" Value="6,3,6,4" />
+			<Setter Property="BorderBrush" Value="Transparent" />
+
+			<Style Selector="^:selected">
+				<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+					<Setter Property="Background" Value="Transparent" />
+				</Style>
+			</Style>
+			<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="Transparent" />
+			</Style>
+		</Style>
+
+		<Style Selector="Button.Command">
+			<Setter Property="MinWidth" Value="50"/>
+			<Setter Property="Margin" Value="5,0,0,0" />
+		</Style>
+
+		<Style Selector="Button.Command:disabled /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Opacity" Value="0.25"/>
+			<Setter Property="OpacityMask" Value="Black"/>
+		</Style>
+		<Style Selector="StackPanel.Options">
+			<Setter Property="Orientation" Value="Vertical"/>
+			<Setter Property="Margin" Value="5,0,0,0"/>
+			<Setter Property="VerticalAlignment" Value="Top"/>
+		</Style>
+	</UserControl.Styles>
+
+	<ScrollViewer>
+		<Grid>
+			<Border Opacity="0.9" Background="{DynamicResource HLab.Brushes.Background}">
+
+				<StackPanel>
+
+					<Grid>
+						<Border
+							Margin="5,10" BorderThickness="2" BorderBrush="{DynamicResource HLab.Brushes.Foreground}" CornerRadius="5"
+							Padding="10">
+							<StackPanel>
+								<CheckBox
+									Content="自动检查更新"
+									IsChecked="{Binding Path=Model.AutoUpdate, FallbackValue=false, Mode=TwoWay}"
+									ToolTip.Tip="启用后台自动检查在线更新。"/>
+
+								<CheckBox
+									Content="开机自启"
+									IsChecked="{Binding Path=Model.LoadAtStartup, FallbackValue=false, Mode=TwoWay}"
+									ToolTip.Tip="在登录会话启动时自动运行。"/>
+								
+								<CheckBox
+									Content="启动时最小化"
+									IsChecked="{Binding Path=Model.StartMinimized, FallbackValue=false, Mode=TwoWay}"
+									ToolTip.Tip="启动时最小化到托盘。"/>
+
+								<Label>后台服务优先级</Label>
+								<StackPanel Orientation="Horizontal">
+								<Label VerticalAlignment="Center">已接管</Label>
+								<ComboBox
+									ItemsSource="{Binding PriorityList}"
+									SelectedItem="{Binding SelectedPriority}">
+
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<Border Background="Transparent">
+												<Label Classes="RadioButtonListBox"
+													   x:DataType="options:ListItem"
+													   Content="{Binding Caption}"
+													   Background="Transparent"
+													   VerticalAlignment="Center"
+													   ToolTip.Tip ="{Binding Description}"/>
+											</Border>
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+
+								</ComboBox>
+                                <Label VerticalAlignment="Center">未接管</Label>
+								<ComboBox
+									ItemsSource="{Binding PriorityList}"
+									SelectedItem="{Binding SelectedPriorityUnhooked}">
+
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<Border Background="Transparent">
+												<Label Classes="RadioButtonListBox"
+													   x:DataType="options:ListItem"
+													   Content="{Binding Caption}"
+													   Background="Transparent"
+													   VerticalAlignment="Center"
+													   ToolTip.Tip ="{Binding Description}"/>
+											</Border>
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+
+								</ComboBox>
+								</StackPanel>
+							</StackPanel>
+						</Border>
+						<Label
+							Background="{DynamicResource HLab.Brushes.Background}"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Top"
+            >系统</Label>
+					</Grid>
+
+
+
+					<Grid>
+						<Border
+							Margin="5,10" BorderThickness="2" BorderBrush="{DynamicResource HLab.Brushes.Foreground}" CornerRadius="5"
+							Padding="10">
+							<StackPanel>
+
+								<StackPanel Classes="Options">
+									<Label ToolTip.Tip="选择处理屏幕切换的算法。">算法</Label>
+
+									<ListBox Classes="RadioButtonListBox"
+											 Background="Transparent"
+											 ItemsSource="{Binding AlgorithmList}"
+											 SelectedItem="{Binding SelectedAlgorithm}">
+
+										<ListBox.ItemTemplate>
+											<DataTemplate>
+												<Border Background="Transparent">
+													<RadioButton Classes="RadioButtonListBox"
+																 x:DataType="options:ListItem"
+																 Content="{Binding Caption}"
+																 Background="Transparent"
+																 VerticalAlignment="Center"
+																 IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}},Mode=TwoWay}"
+																 ToolTip.Tip ="{Binding Description}"/>
+												</Border>
+											</DataTemplate>
+										</ListBox.ItemTemplate>
+
+									</ListBox>
+								</StackPanel>
+
+
+								<StackPanel Classes="Options">
+									<Label ToolTip.Tip="选择处理屏幕切换的算法。">最大跨越距离</Label>
+
+									<NumericUpDown
+										Minimum="{Binding Model.MinimalMaxTravelDistance, FallbackValue=0}"
+										Increment="10"
+										Value="{Binding Model.MaxTravelDistance, FallbackValue=200}"
+										ClipValueToMinMax="True"/>
+								</StackPanel>
+
+								<CheckBox
+									Content="水平循环"
+									IsEnabled="{Binding Path=Model.LoopAllowed, FallbackValue=false}"
+									IsChecked="{Binding Path=Model.LoopX, FallbackValue=false, Mode=TwoWay}"
+									ToolTip.Tip="允许鼠标指针从另一侧越界后在水平方向返回。"/>
+								
+								<CheckBox
+									Content="垂直循环"
+									IsEnabled="{Binding Path=Model.LoopAllowed, FallbackValue=false}"
+									IsChecked="{Binding Path=Model.LoopY, FallbackValue=false, Mode=TwoWay}"
+									ToolTip.Tip="允许鼠标指针从另一侧越界后在垂直方向返回。"/>
+
+								<CheckBox
+									Content="调整速度"
+									IsEnabled="{Binding Path=AdjustSpeedAllowed, FallbackValue=false}"
+									IsChecked="{Binding Path=Model.AdjustSpeed, FallbackValue=false, Mode=TwoWay}"
+									ToolTip.Tip="当系统未考虑屏幕比例时，调整指针速度。"/>
+
+								<CheckBox
+									Content="调整指针"
+									IsEnabled="{Binding Path=AdjustPointerAllowed, FallbackValue=false}"
+									IsChecked="{Binding Path=Model.AdjustPointer, Mode=TwoWay, FallbackValue=false}"
+									ToolTip.Tip="当系统未考虑屏幕比例时，调整指针大小。"/>
+
+							</StackPanel>
+						</Border>
+						<Label
+							Content="鼠标"
+							Background="{DynamicResource HLab.Brushes.Background}"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Top"/>
+					</Grid>
+
+					<Grid>
+						<Border
+							Margin="5,10" BorderThickness="2" BorderBrush="{DynamicResource HLab.Brushes.Foreground}" CornerRadius="5"
+							Padding="10">
+							<StackPanel>
+								<CheckBox
+									Content="允许重叠"
+									IsChecked="{Binding Path=Model.AllowOverlaps, FallbackValue=false, Mode=TwoWay}"
+									ToolTip.Tip="允许显示器区域重叠。"/>
+
+								<CheckBox
+									Content="允许不连续"
+									IsChecked="{Binding Path=Model.AllowDiscontinuity, FallbackValue=false, Mode=TwoWay}"
+									ToolTip.Tip="允许显示器之间存在空隙。"/>
+
+							</StackPanel>
+						</Border>
+						<Label
+							Content="布局"
+							Background="{DynamicResource HLab.Brushes.Background}"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Top"/>
+					</Grid>
+
+					<Grid>
+						<Border
+							Margin="5,10" 
+							BorderThickness="2" 
+							BorderBrush="{DynamicResource HLab.Brushes.Foreground}" 
+							CornerRadius="5"
+							Padding="10">
+
+							<StackPanel>
+								
+								<ListBox
+									ItemsSource="{Binding Model.ExcludedList}"
+									ToolTip.Tip="当这些进程进入前台时将停用 LittleBigMouse。"
+									SelectedValue="{Binding SelectedExcludedProcess}"
+									>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="Transparent">
+                                                <TextBlock Text="{Binding }"
+                                                           Background="Transparent"
+                                                           VerticalAlignment="Center"
+                                                           ToolTip.Tip ="{Binding }"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+								</ListBox>
+								
+								<StackPanel Orientation="Horizontal">
+									<Button Command="{Binding RemoveExcludedProcessCommand}">移除</Button>
+								</StackPanel>
+								
+								<Label>匹配模式： </Label>
+								<Grid ColumnDefinitions="*,Auto">
+									<TextBox Grid.Column="0" TextWrapping="Wrap" Text="{Binding Pattern, UpdateSourceTrigger=PropertyChanged}"/>
+									<Button Grid.Column="1" Command="{Binding AddExcludedProcessCommand}">排除</Button>
+								</Grid>
+								<Label>已检测到的进程： </Label>
+								<ListBox
+									ItemsSource="{Binding SeenProcesses}"
+									ToolTip.Tip="当这些进程进入前台时将停用 LittleBigMouse。"
+									SelectedValue="{Binding SelectedSeenProcess}"
+									>
+                                    <ListBox.Styles>
+                                        <Style Selector="Border.match">
+                                            <Setter Property="Background" Value="Green" />
+                                        </Style>
+                                    </ListBox.Styles>
+
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Classes.match="{Binding Match }">
+                                                <TextBlock
+													x:DataType="options:SeenProcessViewModel"
+													Text="{Binding Caption}"
+													VerticalAlignment="Center"
+													ToolTip.Tip ="{Binding Description}"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+									
+								</ListBox>
+							</StackPanel>
+						</Border>
+
+						<Label
+							Content="排除的进程"
+							Background="{DynamicResource HLab.Brushes.Background}"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Top"/>
+					</Grid>
+				</StackPanel>
+			</Border>
+		</Grid>
+	</ScrollViewer>
+
+</UserControl>
