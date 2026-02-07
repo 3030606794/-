@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 chcp 65001 >nul
-title GitHub 万能发布工具 (最终增强版)
+title GitHub 万能发布工具 (稳定修复版)
 color 0A
 
 :: ========================================================
@@ -54,7 +54,7 @@ if "%repo_url%"=="" goto manual_repo
 goto mode_menu
 
 :: ========================================================
-:: 2. 项目类型 (已添加子模块下载支持)
+:: 2. 项目类型
 :: ========================================================
 :mode_menu
 cls
@@ -62,8 +62,8 @@ echo ========================================================
 echo               第二步：选择项目类型
 echo ========================================================
 echo.
-echo  [1] 电脑软件 (C# .NET 8 / WinUI 3)
-echo      - 目标: .exe (修复子模块丢失问题)
+echo  [1] 电脑软件 (LittleBigMouse 专用修复)
+echo      - 修复闪退问题，自动下载丢失的组件
 echo.
 echo  [2] 安卓软件 (Android)
 echo      - 目标: .apk
@@ -75,41 +75,47 @@ if "%mode%"=="1" goto pc_config
 if "%mode%"=="2" goto android_config
 goto mode_menu
 
-:: --- 电脑版配置 (PC) - 包含子模块递归下载 ---
+:: --- 电脑版配置 (PC) - 逐行写入防止闪退 ---
 :pc_config
 echo.
-echo [1/3] 正在生成 Windows 配置 (包含子模块下载)...
+echo [1/3] 正在生成 Windows 配置 (修复版)...
 if not exist ".github\workflows" mkdir ".github\workflows"
 del ".github\workflows\*.yml" 2>nul
 
-(
-echo name: Windows Build
-echo on:
-echo   push:
-echo     branches: [ "main" ]
-echo jobs:
-echo   build:
-echo     runs-on: windows-latest
-echo     steps:
-echo     - uses: actions/checkout@v4
-echo       with:
-echo         submodules: recursive
-echo     - name: Setup .NET 8
-echo       uses: actions/setup-dotnet@v4
-echo       with:
-echo         dotnet-version: 8.0.x
-echo     - name: Install Workloads
-echo       run: dotnet workload install windows
-echo     - name: Restore dependencies
-echo       run: dotnet restore LittleBigMouse.sln
-echo     - name: Build
-echo       run: dotnet build LittleBigMouse.sln -c Release
-echo     - name: Upload Artifact
-echo       uses: actions/upload-artifact@v4
-echo       with:
-echo         name: LittleBigMouse-Build
-echo         path: "**/bin/Release/**/*.exe"
-) > ".github\workflows\windows_build.yml"
+echo name: Windows Build > ".github\workflows\windows_build.yml"
+echo on: >> ".github\workflows\windows_build.yml"
+echo   push: >> ".github\workflows\windows_build.yml"
+echo     branches: [ "main" ] >> ".github\workflows\windows_build.yml"
+echo jobs: >> ".github\workflows\windows_build.yml"
+echo   build: >> ".github\workflows\windows_build.yml"
+echo     runs-on: windows-latest >> ".github\workflows\windows_build.yml"
+echo     steps: >> ".github\workflows\windows_build.yml"
+echo     - uses: actions/checkout@v4 >> ".github\workflows\windows_build.yml"
+echo       with: >> ".github\workflows\windows_build.yml"
+echo         submodules: false >> ".github\workflows\windows_build.yml"
+echo     - name: Fix Submodules for Fork >> ".github\workflows\windows_build.yml"
+echo       shell: pwsh >> ".github\workflows\windows_build.yml"
+echo       run: ^| >> ".github\workflows\windows_build.yml"
+echo         if (Test-Path .gitmodules) { >> ".github\workflows\windows_build.yml"
+echo           $content = Get-Content .gitmodules >> ".github\workflows\windows_build.yml"
+echo           $content = $content -replace '\.\./', 'https://github.com/mgth/' >> ".github\workflows\windows_build.yml"
+echo           $content ^| Set-Content .gitmodules >> ".github\workflows\windows_build.yml"
+echo         } >> ".github\workflows\windows_build.yml"
+echo         git submodule sync >> ".github\workflows\windows_build.yml"
+echo         git submodule update --init --recursive >> ".github\workflows\windows_build.yml"
+echo     - name: Setup .NET 8 >> ".github\workflows\windows_build.yml"
+echo       uses: actions/setup-dotnet@v4 >> ".github\workflows\windows_build.yml"
+echo       with: >> ".github\workflows\windows_build.yml"
+echo         dotnet-version: 8.0.x >> ".github\workflows\windows_build.yml"
+echo     - name: Restore dependencies >> ".github\workflows\windows_build.yml"
+echo       run: dotnet restore LittleBigMouse.sln >> ".github\workflows\windows_build.yml"
+echo     - name: Build >> ".github\workflows\windows_build.yml"
+echo       run: dotnet build LittleBigMouse.sln -c Release >> ".github\workflows\windows_build.yml"
+echo     - name: Upload Artifact >> ".github\workflows\windows_build.yml"
+echo       uses: actions/upload-artifact@v4 >> ".github\workflows\windows_build.yml"
+echo       with: >> ".github\workflows\windows_build.yml"
+echo         name: LittleBigMouse-Build >> ".github\workflows\windows_build.yml"
+echo         path: "**/bin/Release/**/*.exe" >> ".github\workflows\windows_build.yml"
 
 goto upload_start
 
@@ -120,33 +126,31 @@ echo [1/3] 正在生成 Android 配置...
 if not exist ".github\workflows" mkdir ".github\workflows"
 del ".github\workflows\*.yml" 2>nul
 
-(
-echo name: Android Build
-echo on:
-echo   push:
-echo     branches: [ "main" ]
-echo jobs:
-echo   build-android:
-echo     runs-on: ubuntu-latest
-echo     steps:
-echo     - uses: actions/checkout@v4
-echo       with:
-echo         submodules: recursive
-echo     - name: Set up JDK 17
-echo       uses: actions/setup-java@v4
-echo       with:
-echo         java-version: '17'
-echo         distribution: 'temurin'
-echo     - name: Grant execute permission for gradlew
-echo       run: chmod +x gradlew
-echo     - name: Build with Gradle
-echo       run: ./gradlew assembleDebug
-echo     - name: Upload APK
-echo       uses: actions/upload-artifact@v4
-echo       with:
-echo         name: Android-APK-Installer
-echo         path: "**/*.apk"
-) > ".github\workflows\android_build.yml"
+echo name: Android Build > ".github\workflows\android_build.yml"
+echo on: >> ".github\workflows\android_build.yml"
+echo   push: >> ".github\workflows\android_build.yml"
+echo     branches: [ "main" ] >> ".github\workflows\android_build.yml"
+echo jobs: >> ".github\workflows\android_build.yml"
+echo   build-android: >> ".github\workflows\android_build.yml"
+echo     runs-on: ubuntu-latest >> ".github\workflows\android_build.yml"
+echo     steps: >> ".github\workflows\android_build.yml"
+echo     - uses: actions/checkout@v4 >> ".github\workflows\android_build.yml"
+echo       with: >> ".github\workflows\android_build.yml"
+echo         submodules: recursive >> ".github\workflows\android_build.yml"
+echo     - name: Set up JDK 17 >> ".github\workflows\android_build.yml"
+echo       uses: actions/setup-java@v4 >> ".github\workflows\android_build.yml"
+echo       with: >> ".github\workflows\android_build.yml"
+echo         java-version: '17' >> ".github\workflows\android_build.yml"
+echo         distribution: 'temurin' >> ".github\workflows\android_build.yml"
+echo     - name: Grant execute permission for gradlew >> ".github\workflows\android_build.yml"
+echo       run: chmod +x gradlew >> ".github\workflows\android_build.yml"
+echo     - name: Build with Gradle >> ".github\workflows\android_build.yml"
+echo       run: ./gradlew assembleDebug >> ".github\workflows\android_build.yml"
+echo     - name: Upload APK >> ".github\workflows\android_build.yml"
+echo       uses: actions/upload-artifact@v4 >> ".github\workflows\android_build.yml"
+echo       with: >> ".github\workflows\android_build.yml"
+echo         name: Android-APK-Installer >> ".github\workflows\android_build.yml"
+echo         path: "**/*.apk" >> ".github\workflows\android_build.yml"
 
 goto upload_start
 

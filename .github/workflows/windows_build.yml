@@ -1,26 +1,34 @@
-name: Windows Build
-on:
-  push:
-    branches: [ "main" ]
-jobs:
-  build:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-    - name: Setup .NET 8
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Install Workloads
-      run: dotnet workload install windows
-    - name: Restore dependencies
-      run: dotnet restore LittleBigMouse.sln
-    - name: Build
-      run: dotnet build LittleBigMouse.sln -c Release
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: LittleBigMouse-Build
-        path: "**/bin/Release/**/*.exe"
+name: Windows Build 
+on: 
+  push: 
+    branches: [ "main" ] 
+jobs: 
+  build: 
+    runs-on: windows-latest 
+    steps: 
+    - uses: actions/checkout@v4 
+      with: 
+        submodules: false 
+    - name: Fix Submodules for Fork 
+      shell: pwsh 
+      run: | 
+        if (Test-Path .gitmodules) { 
+          $content = Get-Content .gitmodules 
+          $content = $content -replace '\.\./', 'https://github.com/mgth/' 
+          $content | Set-Content .gitmodules 
+        } 
+        git submodule sync 
+        git submodule update --init --recursive 
+    - name: Setup .NET 8 
+      uses: actions/setup-dotnet@v4 
+      with: 
+        dotnet-version: 8.0.x 
+    - name: Restore dependencies 
+      run: dotnet restore LittleBigMouse.sln 
+    - name: Build 
+      run: dotnet build LittleBigMouse.sln -c Release 
+    - name: Upload Artifact 
+      uses: actions/upload-artifact@v4 
+      with: 
+        name: LittleBigMouse-Build 
+        path: "**/bin/Release/**/*.exe" 
